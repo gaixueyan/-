@@ -1,0 +1,155 @@
+WA：
+
+#include <stdio.h>
+
+int main() {
+
+    int n;
+
+    while(scanf("%d",&n)!=EOF) {
+
+        int i,k;
+
+        long long x,y,z;
+
+        for(i=0;i<n;i++) {
+
+            scanf("%lld %lld %lld %d",&x,&y,&z,&k);
+
+            bool arith=false,geo=false;
+
+            int d,q;
+
+            if((y-x)==(z-y)) {
+
+                d = y - x;
+
+                arith = true;
+
+            }
+
+            else {
+
+                geo = true;
+
+                q = y/x;
+
+            }
+
+            long long ans = 1;
+
+            if(arith) 
+
+                ans = x + (k-1)*d;
+
+            if(geo) {
+
+                k = k - 1;
+
+                while(k) {
+
+                    if(k%2==1) 
+
+                        ans *= q;
+
+                    q = q*q;
+
+                    k /= 2;
+
+                }
+
+            }
+
+            printf("%d\n",ans%200907);
+
+        }
+
+    }
+
+    return 0;
+
+}
+
+
+错误原因：
+1. 0 < K <= 10^9, and the other three numbers are in the range [0, 2^63)。 k可为int，x,y,z，ans要定义为long long，而且d,q也要定义为long long。
+2.if(geo) {....} 中，q = q * q，不能直接计算出来，因为可能数会非常大，超过了long long的表示范围。
+
+AC：
+
+#include <stdio.h>
+
+#define M 200907 // ans%M
+
+int main() {
+
+    int n;
+
+    while(scanf("%d",&n)!=EOF) {
+
+        int i,k;
+
+        long long x,y,z;
+
+        for(i=0;i<n;i++) {
+
+            scanf("%lld %lld %lld %d",&x,&y,&z,&k);
+
+            bool arith=false,geo=false;
+
+            long long d,q;
+
+            if((y-x)==(z-y)) {
+
+                d = y - x;
+
+                arith = true;
+
+            }
+
+            else {
+
+                geo = true;
+
+                q = y/x;
+
+            }
+
+            long long ans = x;
+
+            if(arith) 
+
+                ans = (x%M + ((k-1)%M*(d%M))%M)%M;
+
+            if(geo) {
+
+                k = k - 1;
+
+                while(k) {
+
+                    if(k%2==1) { 
+
+                        ans = ans*q%M;
+
+                    }
+
+                    q = q*q % M;
+
+                    k /= 2;
+
+                }
+
+            }
+
+            printf("%d\n",ans);
+
+        }
+
+    }
+
+    return 0;
+
+}
+%符号的两个公式： 
+①(a * b) % c = (a % c) * (b % c)
+②(a + b) % c = (a % c + b % c) % c
